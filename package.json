@@ -6,15 +6,16 @@
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": ["EarningDROP",
-  "Phros Testnet",
-  "Auto Bot",
-  "Automation",
-  "Cryptocurrency",
-  "Airdrop",
-  "Testnet",
-  "Bot",
- ],
+  "keywords": [
+    "EarningDROP",
+    "Phros Testnet",
+    "Auto Bot",
+    "Automation",
+    "Cryptocurrency",
+    "Airdrop",
+    "Testnet",
+    "Bot"
+  ],
   "author": "Makera1n",
   "license": "ISC",
   "description": "",
