@@ -351,7 +351,7 @@ async function updateWalletData() {
         new ethers.Contract(WPHRS_ADDRESS, ERC20_ABI, provider).balanceOf(wallet.address).catch(() => 0),
         new ethers.Contract(USDT_ADDRESS, ERC20_ABI, provider).balanceOf(wallet.address).catch(() => 0)
       ]);
-      const formattedEntry = `${i === selectedWalletIndex ? "→ " : "  "}${getShortAddress(wallet.address)}   ${Number(ethers.formatEther(phrsBalance)).toFixed(4).padEnd(8)} ${Number(ethers.formatEther(balanceWPHRS)).toFixed(2).padEnd(8)}${Number(ethers.formatEther(balanceUSDT)).toFixed(2).padEnd(8)}`;
+      const formattedEntry = `${i === selectedWalletIndex ? "→ " : "  "}${getShortAddress(wallet.address)}    ${Number(ethers.formatEther(phrsBalance)).toFixed(4).padEnd(8)} ${Number(ethers.formatEther(balanceWPHRS)).toFixed(2).padEnd(8)}${Number(ethers.formatEther(balanceUSDT)).toFixed(2).padEnd(8)}`;
       if (i === selectedWalletIndex) {
         walletInfo.address = wallet.address;
         walletInfo.activeAccount = `Account ${i + 1}`;
@@ -362,7 +362,7 @@ async function updateWalletData() {
       return formattedEntry;
     } catch (error) {
       addLog(`Failed to fetch wallet data for account #${i + 1}: ${error.message}`, "error");
-      return `${i === selectedWalletIndex ? "→ " : "  "}N/A 0.00       0.00     0.00`;
+      return `${i === selectedWalletIndex ? "→ " : "  "}N/A 0.00        0.00      0.00`;
     }
   });
   const walletData = await Promise.all(walletDataPromises);
@@ -1043,7 +1043,7 @@ async function runDailyActivity() {
 
 const screen = blessed.screen({
   smartCSR: true,
-  title: "PHAROS AUTO BOT",
+  title: "Pharos Testnet Auto Bot", // Changed title here
   autoPadding: true,
   fullUnicode: true,
   mouse: true,
@@ -1430,7 +1430,7 @@ function updateStatus() {
 
 async function updateWallets() {
   const walletData = await updateWalletData();
-  const header = `${chalk.bold.cyan("     Address".padEnd(12))}       ${chalk.bold.cyan("PHRs".padEnd(8))}${chalk.bold.cyan("wPHRs".padEnd(8))}${chalk.bold.cyan("USDT".padEnd(8))}`;
+  const header = `${chalk.bold.cyan("      Address".padEnd(12))}        ${chalk.bold.cyan("PHRs".padEnd(8))}${chalk.bold.cyan("wPHRs".padEnd(8))}${chalk.bold.cyan("USDT".padEnd(8))}`;
   const separator = chalk.gray("-".repeat(49));
   try {
     walletBox.setItems([header, separator, ...walletData]);
