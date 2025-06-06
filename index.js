@@ -210,7 +210,7 @@ const getConfiguration = async () => {
         {
             type: 'input',
             name: 'delayMinutes',
-            message: theme.primary('⏱️  Enter delay between cycles (minutes):'),
+            message: theme.primary('⏱️ Enter delay between cycles (minutes):'),
             default: '30',
             prefix: '', // Add this line to remove the '?'
             validate: (input) => {
