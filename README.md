@@ -8,7 +8,7 @@ Pharos Testnet Auto Interaction Bot is a JavaScript-based automation script desi
 - Dynamic terminal interface (TUI)** with `blessed` + `chalk`
 - Direct interaction with smart contracts via `ethers.js`
 - Supports HTTP and SOCKS Proxy
-- Multiple wallet support (via `.env` and `wallet.txt`)
+- Multiple wallet support via `.env`
 
 ## Prerequisites
 
@@ -51,20 +51,20 @@ npm -v
 5. Create a `.env` file in the root directory and add your private keys:
 
    ```bash
-   nano .env
+   echo 'PRIVATE_KEY_1=' > .env
    ```
 
    Add the following line inside `.env`:
 
    ```env
-   PRIVATE_KEYS="0xabc123...,0xdef456...,0xghi789..."
+   PRIVATE_KEY_1="0xabc123...,0xdef456...,0xghi789..."
    ```
 
    - Replace each `0xabc123...` with your actual private keys separated by commas.  
    - Keys can optionally omit the `0x` prefix, but including it is recommended.  
    - Example:
      ```
-     PRIVATE_KEYS="0x1111aaa...,0x2222bbb...,0x3333ccc..."
+     PRIVATE_KEY_1="0x1111aaa...,0x2222bbb...,0x3333ccc..."
      ```
 
 6. Run the bot:
