@@ -588,14 +588,19 @@ const getMulticallData = (pair, amount, walletAddress) => {
         const decimals = tokenDecimals[pair.from];
         const scaledAmount = ethers.parseUnits(amount.toString(), decimals);
 
-        // This encoding assumes a specific function signature within the multicall contract.
-        // Ensure '0x04e45aaf' corresponds to the correct function selector for your swap.
+        // --- ATTENTION ---
+        // The following encoding is highly specific and potentially fragile.
+        // 1. Function Selector '0x04e45aaf' likely corresponds to a function like 'exactInputSingle'.
+        //    Ensure this is the correct selector for the contract at 'contractAddress'.
+        // 2. Data Types: The encoded types must EXACTLY match the function's parameter types.
+        //    For a standard Uniswap V3 router, the fee should be 'uint24' and sqrtPriceLimitX96 should be 'uint160'.
+        //    Your current code encodes the fee tier (500) as a 'uint256', which might be incorrect and cause reverts.
         const data = ethers.AbiCoder.defaultAbiCoder().encode(
             ['address', 'address', 'uint256', 'address', 'uint256', 'uint256', 'uint256'],
             [
                 tokens[pair.from],
                 tokens[pair.to],
-                500, // This typically represents the fee tier or slippage tolerance. Adjust as needed.
+                500, // This typically represents the fee tier. Uniswap V3 uses uint24. Ensure this is correct for your router.
                 walletAddress,
                 scaledAmount,
                 0, // This is amountOutMin, set to 0 for maximum slippage. Consider setting a realistic minimum.
@@ -622,19 +627,13 @@ const performSwap = async (wallet, provider, index, jwt, proxy) => {
         );
 
         const decimals = tokenDecimals[pair.from];
-        const tokenContract = new ethers.Contract(tokens[pair.from], erc20Abi, provider);
-        const balance = await tokenContract.balance(wallet.address); // Changed to .balance (ethers v6)
-        const required = ethers.parseUnits(amount.toString(), decimals);
-
-        if (balance < required) {
-            logger.warning(
-                `Insufficient ${pair.from} balance: ${theme.error(ethers.formatUnits(balance, decimals))} < ${theme.success(amount)}`,
-                '💸'
-            );
-            return;
-        }
-
+        
+        // --- FIX ---
+        // The check for balance and approval is now handled entirely by the robust
+        // `checkBalanceAndApproval` function. This avoids the incorrect `tokenContract.balance()` call
+        // and removes redundant logic.
         if (!(await checkBalanceAndApproval(wallet, tokens[pair.from], amount, decimals, contractAddress))) {
+            logger.warning(`Swap ${index + 1} skipped due to balance or approval issue.`, '⚠️');
             return;
         }
 
@@ -650,6 +649,10 @@ const performSwap = async (wallet, provider, index, jwt, proxy) => {
         let estimatedGas;
         
         try {
+            // --- ATTENTION ---
+            // You are passing 'deadline' as the first argument ('collectionAndSelfcalls') to your multicall function.
+            // This is unusual. Ensure this is the expected behavior for your specific multicall contract.
+            // Standard multicall contracts often only take a single bytes[] argument.
             estimatedGas = await contract.multicall.estimateGas(deadline, multicallData, {
                 from: wallet.address,
             });
@@ -683,7 +686,7 @@ const performSwap = async (wallet, provider, index, jwt, proxy) => {
         }
     } catch (error) {
         logger.error(`Swap ${index + 1} failed: ${error.message}`, '❌');
-           if (error.transaction) {
+            if (error.transaction) {
             logger.error(`Transaction details: ${JSON.stringify(error.transaction, null, 2)}`, '🔍');
         }
         if (error.receipt) {
@@ -691,6 +694,7 @@ const performSwap = async (wallet, provider, index, jwt, proxy) => {
         }
     }
 };
+
 
 const transferPHRS = async (wallet, provider, index, jwt, proxy) => {
     try {
